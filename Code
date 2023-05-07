@@ -1,0 +1,98 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+import warnings
+
+warnings.filterwarnings('ignore')
+
+df = pd.read_csv('/Users/moazmahmood/Desktop/Data Science Training/Beginner/02. Removal of Outliers/placement.csv')
+
+df.head()
+
+plt.figure(figsize=(15,5))
+
+## Plotting the CGPA Graph
+plt.subplot(1,2,1)
+sns.distplot(df['cgpa'])
+
+## Plotting the AP Placement Marks Graph
+plt.subplot(1,2,2)
+sns.distplot(df['placement_exam_marks'])
+
+plt.tight_layout()
+plt.show()
+
+## Determining way by which outliers will be removed in both cases
+
+cgpa_skew = df['cgpa'].skew()
+pem_skew = df['placement_exam_marks'].skew()
+
+print(cgpa_skew, pem_skew)
+
+## For CGPA, we will use z-score method
+## For Placement Exam Marks, we will use IQR
+
+## CGPA graph seems to be normally distributed and we will treat all values above and below the mean by 3*std as outliers
+
+low_lim = df_cgpa.mean() - 3*df_cgpa.std()
+high_lim = df_cgpa.mean() + 3*df_cgpa.std()
+
+new_df_cgpa1 = df[(df['cgpa'] > low_lim) & (df['cgpa'] < high_lim)]
+
+new_df_cgpa1
+
+## Now we will remove the outliers using the z-score test to verify our work.
+
+df['cgpa_z_score'] = ( df['cgpa'] - df['cgpa'].mean() ) / df['cgpa'].std()
+new_df_cgpa2 = df[(df['cgpa_z_score'] < 3) & (df['cgpa_z_score'] > -3)]
+
+new_df_cgpa2
+
+plt.figure(figsize=(15,5))
+
+plt.subplot(1,2,1)
+plt.title('CGPA Original Data')
+sns.distplot(df['cgpa'])
+
+plt.subplot(1,2,2)
+plt.title('CGPA Data without Outliers')
+sns.distplot(new_df_cgpa1['cgpa'])
+
+plt.tight_layout()
+plt.plot()
+
+plt.figure(figsize=(15,5))
+
+plt.subplot(1,2,1)
+sns.distplot(df['placement_exam_marks'])
+plt.title('ORIGINAL / Distribution Plot - Placement Exam Marks')
+
+plt.subplot(1,2,2)
+sns.boxplot(df['placement_exam_marks'])
+plt.title('ORIGINAL / Box-and-Whisker - Placement Exam Marks')
+
+plt.tight_layout()
+plt.show()
+
+## For Placement Exam Marks, we will use the interquartile range method since data is skewed
+
+Q1 = df['placement_exam_marks'].quantile(0.25)
+Q3 = df['placement_exam_marks'].quantile(0.75)
+
+IQR = Q3 - Q1
+
+new_df_pem = df[(df['placement_exam_marks'] > Q1 - 1.5*IQR) & (df['placement_exam_marks'] < Q3 + 1.5*IQR)]
+
+plt.figure(figsize=(15,5))
+
+plt.subplot(1,2,1)
+sns.distplot(new_df_pem['placement_exam_marks'])
+plt.title('AFTER / Distribution Plot - Placement Exam Marks')
+
+plt.subplot(1,2,2)
+sns.boxplot(new_df_pem['placement_exam_marks'])
+plt.title('AFTER / Box-and-Whisker - Placement Exam Marks')
+
+plt.tight_layout()
+plt.show()
